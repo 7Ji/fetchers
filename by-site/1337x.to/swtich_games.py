@@ -24,29 +24,33 @@ url = f"{site}/sub/82/1/"
 session = requests.session()
 links = []
 
-while True:
-    r = session.get(url)
-    if r.status_code != 200:
-        raise Exception("Non 200 response")
-    soup = BeautifulSoup(r.content, 'html.parser')
-    for row in soup.find_all('td', class_="coll-1 name"):
-        url_torrent = f"{site}{row.find_all('a')[-1].get('href')}"
-        r = session.get(url_torrent)
+try:
+    while True:
+        r = session.get(url)
         if r.status_code != 200:
             raise Exception("Non 200 response")
-        soup_torrent = BeautifulSoup(r.content, 'html.parser')
-        link = soup_torrent.find('a', id="openPopup").get('href')
-        print(link)
-        links.append(link)
-            
-    pages = soup.find('div', class_="pagination").find_all('li')
-    if pages[-1].find('a').string == 'Last':
-        url = f"{site}{pages[-2].find('a').get('href')}"
-    else:
+        soup = BeautifulSoup(r.content, 'html.parser')
+        for row in soup.find_all('td', class_="coll-1 name"):
+            url_torrent = f"{site}{row.find_all('a')[-1].get('href')}"
+            r = session.get(url_torrent)
+            if r.status_code != 200:
+                raise Exception("Non 200 response")
+            soup_torrent = BeautifulSoup(r.content, 'html.parser')
+            link = soup_torrent.find('a', id="openPopup").get('href')
+            print(link)
+            links.append(link)
+                
+        pages = soup.find('div', class_="pagination").find_all('li')
         break
+        if pages[-1].find('a').string == 'Last':
+            url = f"{site}{pages[-2].find('a').get('href')}"
+        else:
+            break
 
-links.sort()
+    links.sort()
+except:
+    pass
 with open('1337x.to-magnet-links.list', 'wb') as f:
     for link in links:
-        f.write(link)
-        f.write('\n')
+        f.write(link.encode('utf-8'))
+        f.write(b'\n')
