@@ -1,0 +1,1 @@
+Collection of 7Ji's resource fetchers
